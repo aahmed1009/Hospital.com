@@ -18,12 +18,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     if ($user && password_verify($password, $user['password'])) {
-        // Set session variables
+
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['user_type'] = $user['user_type'];
 
-        // Redirect based on user type
+ 
         if ($user['user_type'] == 'doctor') {
             header("Location: doctor_dashboard.php");
         } else {

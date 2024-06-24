@@ -1,8 +1,7 @@
 <?php
-include 'db.php';  // Ensure your db.php file is configured correctly
+include 'db.php';  
 session_start();
 
-// Authentication and redirection
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'patient') {
     header("Location: login.php");
     exit;
@@ -10,7 +9,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'patient') {
 
 $patient_id = $_SESSION['user_id'];
 
-// Fetch patient appointments including prescriptions and doctor details
 $appointmentsSql = "SELECT a.*, d.specialization, d.photo_url, d.phone, u.username AS doctor_name, pr.prescription_text
                     FROM appointments a
                     JOIN doctors_details d ON a.doctor_id = d.doctor_id
@@ -21,19 +19,17 @@ $appointmentsStmt = $pdo->prepare($appointmentsSql);
 $appointmentsStmt->execute([$patient_id]);
 $appointments = $appointmentsStmt->fetchAll();
 
-// Fetch all specializations
 $specializationsSql = "SELECT DISTINCT specialization FROM doctors_details";
 $specializationsStmt = $pdo->prepare($specializationsSql);
 $specializationsStmt->execute();
 $specializations = $specializationsStmt->fetchAll(PDO::FETCH_COLUMN);
 
-// Fetch all doctors
 $doctorsSql = "SELECT doctor_id, specialization, username, photo_url FROM doctors_details JOIN users ON doctors_details.doctor_id = users.user_id";
 $doctorsStmt = $pdo->prepare($doctorsSql);
 $doctorsStmt->execute();
 $doctors = $doctorsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Handle booking and canceling appointments
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['book_appointment'])) {
         $doctor_id = $_POST['doctor_id'];

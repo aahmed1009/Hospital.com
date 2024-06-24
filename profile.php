@@ -2,7 +2,6 @@
 include 'db.php';
 session_start();
 
-// Authentication and redirection
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -11,13 +10,13 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_type = $_SESSION['user_type'];
 
-// Fetch user details
+
 $userSql = "SELECT * FROM users WHERE user_id = ?";
 $userStmt = $pdo->prepare($userSql);
 $userStmt->execute([$user_id]);
 $user = $userStmt->fetch();
 
-// Fetch additional details for doctors
+
 if ($user_type == 'doctor') {
     $detailsSql = "SELECT * FROM doctors_details WHERE doctor_id = ?";
     $detailsStmt = $pdo->prepare($detailsSql);
@@ -25,14 +24,13 @@ if ($user_type == 'doctor') {
     $details = $detailsStmt->fetch();
 }
 
-// Handle profile update
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['update_profile'])) {
         $username = $_POST['username'];
         $email = $_POST['email'];
         $phone = $_POST['phone'];
 
-        // Handle file upload
+   
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
             $target_dir = "uploads/";
             if (!file_exists($target_dir)) {
@@ -60,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $updateDetailsStmt->execute([$phone, $target_file, $user_id]);
         }
 
-        // Reload to see changes
+
         header("Refresh:0");
     } elseif (isset($_POST['change_password'])) {
         $old_password = $_POST['old_password'];

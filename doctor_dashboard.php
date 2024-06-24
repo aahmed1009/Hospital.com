@@ -1,22 +1,17 @@
 <?php
 include 'db.php';
 session_start();
-
-
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] != 'doctor') {
     header("Location: login.php");
     exit;
 }
 
 $doctor_id = $_SESSION['user_id'];
-
-// Fetch doctor's details
 $doctorDetailsSql = "SELECT * FROM doctors_details WHERE doctor_id = ?";
 $doctorDetailsStmt = $pdo->prepare($doctorDetailsSql);
 $doctorDetailsStmt->execute([$doctor_id]);
 $doctorDetails = $doctorDetailsStmt->fetch();
 
-// Fetch appointments
 $appointmentsSql = "SELECT a.*, p.username AS patient_name, IFNULL(pr.prescription_text, 'N/A') AS prescription
                     FROM appointments a
                     JOIN users p ON a.patient_id = p.user_id
@@ -26,13 +21,11 @@ $appointmentsStmt = $pdo->prepare($appointmentsSql);
 $appointmentsStmt->execute([$doctor_id]);
 $appointments = $appointmentsStmt->fetchAll();
 
-// Fetch schedules
 $schedulesSql = "SELECT * FROM doctor_schedules WHERE doctor_id = ?";
 $schedulesStmt = $pdo->prepare($schedulesSql);
 $schedulesStmt->execute([$doctor_id]);
 $schedules = $schedulesStmt->fetchAll();
 
-// Handle POST requests for various actions
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['add_schedule'])) {
         $start = $_POST['start_time'];
@@ -45,12 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $appointment_id = $_POST['appointment_id'];
         $prescription = $_POST['prescription'];
         
-        // Update appointment status
+
         $updateSql = "UPDATE appointments SET status = 'completed' WHERE appointment_id = ?";
         $updateStmt = $pdo->prepare($updateSql);
         $updateStmt->execute([$appointment_id]);
         
-        // Insert or update prescription
+   
         $prescriptionSql = "INSERT INTO prescriptions (appointment_id, doctor_id, patient_id, prescription_text, date_prescribed)
                             VALUES (?, ?, ?, ?, NOW())
                             ON DUPLICATE KEY UPDATE 
@@ -119,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       top: 0;
     }
 
-    /* Hiding the Actions column during print */
+
     .table th:last-child,
     .table td:last-child {
       display: none;

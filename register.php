@@ -1,14 +1,13 @@
 <?php
-// Include the database connection script
-include 'db.php'; // Make sure the path and file exist
 
-// Define popular specializations
+include 'db.php'; 
+
+
 $specializations = [
     "Cardiology", "Dermatology", "Neurology", "Pediatrics", "General Medicine", 
     "Orthopedics", "Gynecology", "Oncology", "Radiology", "Psychiatry"
 ];
 
-// Handle the POST request to register a user
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -18,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $gender = $_POST['gender'];
     $dob = $_POST['dob'];
 
-    // Check if username already exists
+
     $checkUsernameSql = "SELECT COUNT(*) FROM users WHERE username = ?";
     $checkUsernameStmt = $pdo->prepare($checkUsernameSql);
     $checkUsernameStmt->execute([$username]);
@@ -27,20 +26,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($usernameExists) {
         echo "Error: Username already exists. Please choose another username.";
     } else {
-        // Insert into users table
+   
         $sql = "INSERT INTO users (username, password, email, user_type, address, gender, dob) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
         if ($stmt->execute([$username, $password, $email, $user_type, $address, $gender, $dob])) {
             $user_id = $pdo->lastInsertId();
 
-            // Handle additional details for doctor
+
             if ($user_type == 'doctor') {
                 $specialization = $_POST['specialization'] == 'other' ? $_POST['new_specialization'] : $_POST['specialization'];
                 $phone = $_POST['phone'];
                 $available_times = $_POST['available_times'];
                 $qualifications = $_POST['qualifications'];
                 
-                // Handle file upload
+   
                 if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
                     $target_dir = "uploads/";
                     if (!file_exists($target_dir)) {
@@ -57,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->execute([$user_id, $specialization, $phone, $target_file, $available_times, $qualifications]);
             }
 
-            // Handle additional details for patient
+
             if ($user_type == 'patient') {
                 $emergency_contact = $_POST['emergency_contact'];
 
@@ -66,7 +65,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->execute([$user_id, $emergency_contact]);
             }
 
-            // Redirect to login page or dashboard
             header("Location: login.php");
             exit;
         } else {
