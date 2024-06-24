@@ -102,6 +102,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   .table td {
     vertical-align: middle;
   }
+
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+
+    .table,
+    .table * {
+      visibility: visible;
+    }
+
+    .table {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    /* Hiding the Actions column during print */
+    .table th:last-child,
+    .table td:last-child {
+      display: none;
+    }
+  }
   </style>
 </head>
 
@@ -151,6 +174,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <?php endforeach; ?>
         </tbody>
       </table>
+      <button class="btn btn-info" onclick="printAppointments()">Print Appointments </button>
+
       <h4>Add New Availability:</h4>
       <form action="doctor_dashboard.php" method="post" class="form-inline mb-3">
         <div class="form-group mb-2">
@@ -172,6 +197,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </ul>
     </div>
   </div>
+  <script>
+  function printAppointments() {
+    let content = document.querySelector('.table').outerHTML;
+    let originalContent = document.body.innerHTML;
+    document.body.innerHTML = content;
+    window.print();
+    document.body.innerHTML = originalContent;
+  }
+  </script>
+
+
+
 </body>
 
 </html>
